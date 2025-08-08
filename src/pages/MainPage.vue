@@ -1,5 +1,22 @@
 <script setup lang="ts">
 import MapView from '@/widgets/MapView/MapView.vue'
+import { onMounted } from 'vue'
+import { TEXTS } from '@/shared/constants/texts'
+import { useMarkersStore } from '@/shared/stores/useMarkersStore'
+
+const markersStore = useMarkersStore()
+
+onMounted(() => {
+  markersStore.setLoading(true)
+  try {
+    markersStore.loadMarkersFromStorage()
+    markersStore.setError(null)
+  } catch (err) {
+    markersStore.setError(TEXTS.errorLoadingMarkers)
+  } finally {
+    markersStore.setLoading(false)
+  }
+})
 </script>
 
 <template>
