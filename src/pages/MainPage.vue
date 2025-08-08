@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MapView from '@/widgets/MapView/MapView.vue'
+import Sidebar from '@/widgets/Sidebar/Sidebar.vue'
 import { onMounted } from 'vue'
 import { TEXTS } from '@/shared/constants/texts'
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
@@ -22,7 +23,7 @@ onMounted(() => {
 <template>
   <div class="wrapper">
     <div class="sidebar">
-      <h2>Сайдбар</h2>
+      <Sidebar />
     </div>
     <div class="mapContainer">
       <MapView />
@@ -33,20 +34,21 @@ onMounted(() => {
 <style scoped>
 .wrapper {
   display: flex;
+  justify-content: space-between;
   height: 100%;
   width: 100%;
+  padding: 10px;
 }
 
 .sidebar {
-  width: 30%;
-  background-color: #f5f5f5;
-  padding: 20px;
-  border-right: 2px solid #ddd;
+  flex: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mapContainer {
-  width: 70%;
-  background-color: #fff;
+  flex: 7;
 }
 
 h2 {

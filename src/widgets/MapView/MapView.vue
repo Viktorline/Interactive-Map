@@ -20,7 +20,7 @@ const { isLoading, error } = useMap(mapTarget, {
       {{ error }}
     </div>
 
-    <div ref="mapTarget" class="map" :class="{ 'map--loading': isLoading }" />
+    <div ref="mapTarget" class="map" :class="{ 'map-loading': isLoading }" />
   </div>
 </template>
 
@@ -36,9 +36,11 @@ const { isLoading, error } = useMap(mapTarget, {
   height: 100%;
   background-color: #f8f9fa;
   transition: opacity 0.3s ease;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-.map--loading {
+.map-loading {
   opacity: 0.5;
 }
 

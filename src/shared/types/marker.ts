@@ -1,4 +1,4 @@
-export type Coordinates = [number, number]
+export type Coordinates = readonly [number, number]
 
 export interface Marker {
   id: string
