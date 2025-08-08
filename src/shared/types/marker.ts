@@ -6,3 +6,5 @@ export interface Marker {
   createdAt: string
   coordinates: Coordinates
 }
+
+export type PopupState = 'icon' | 'view' | 'edit' // не здесь должно быть

@@ -1,25 +1,100 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch, h, render, nextTick } from 'vue'
+import Overlay from 'ol/Overlay'
 import { useMap } from '@/shared/lib/useMap'
-import { TEXTS } from '@/shared/constants/texts'
+import { useMarkersStore } from '@/shared/stores/useMarkersStore'
+import { fromLonLat } from 'ol/proj'
 import { MOSCOW_COORDINATES } from '@/shared/constants/constants'
+import Popup from '@/shared/ui/Popup/Popup.vue'
+import { TEXTS } from '@/shared/constants/texts'
+import type { Marker } from '@/shared/types/marker'
 
 const mapTarget = ref<HTMLElement | null>(null)
+const store = useMarkersStore()
+const overlays = ref<{ id: string; overlay: Overlay; state: 'icon' | 'view' }[]>([])
 
-const { isLoading, error } = useMap(mapTarget, {
+const { map, isLoading, error } = useMap(mapTarget, {
   center: MOSCOW_COORDINATES,
   zoom: 10,
+})
+
+function closeAllPopups() {
+  overlays.value.forEach(({ id, overlay }) => {
+    const container = overlay.getElement()
+    if (!container) return
+
+    const popupVNode = h(Popup, {
+      state: 'icon',
+      marker: store.markers.find((m) => m.id === id) as Marker,
+      onClick: () => openPopup(id),
+    })
+    render(popupVNode, container)
+  })
+}
+
+function openPopup(id: string) {
+  overlays.value.forEach(({ id: otherId, overlay }) => {
+    const container = overlay.getElement()
+    if (!container) return
+
+    const state = id === otherId ? 'view' : 'icon'
+
+    const popupVNode = h(Popup, {
+      state,
+      marker: store.markers.find((m) => m.id === otherId) as Marker,
+      onClose: closeAllPopups,
+      onClick: () => openPopup(otherId),
+    })
+    render(popupVNode, container)
+  })
+}
+
+onMounted(() => {
+  store.loadMarkersFromStorage()
+
+  watch(
+    () => store.markers,
+    async (markers) => {
+      if (!map.value) return
+
+      overlays.value.forEach(({ overlay }) => map.value!.removeOverlay(overlay as Overlay))
+      overlays.value = []
+
+      markers.forEach((marker) => {
+        const container = document.createElement('div')
+
+        const popupVNode = h(Popup, {
+          state: 'icon',
+          marker: marker as Marker,
+          onClick: () => openPopup(marker.id),
+        })
+        render(popupVNode, container)
+
+        const overlay = new Overlay({
+          element: container,
+          positioning: 'bottom-center',
+          stopEvent: false,
+        })
+
+        overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
+        map.value!.addOverlay(overlay)
+        overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+      })
+
+      map.value.getViewport().addEventListener('click', (e) => {
+        const isInsidePopup = (e.target as HTMLElement).closest('.popup')
+        if (!isInsidePopup) closeAllPopups()
+      })
+    },
+    { immediate: true },
+  )
 })
 </script>
 
 <template>
   <div class="map-container">
     <div v-if="isLoading" class="loading">{{ TEXTS.loading }}</div>
-
-    <div v-else-if="error" class="error">
-      {{ error }}
-    </div>
-
+    <div v-else-if="error" class="error">{{ error }}</div>
     <div ref="mapTarget" class="map" :class="{ 'map-loading': isLoading }" />
   </div>
 </template>

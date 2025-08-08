@@ -93,9 +93,9 @@ export const useMarkersStore = defineStore('markers', () => {
   }
 
   return {
-    markers: readonly(markers),
-    loading: readonly(loading),
-    error: readonly(error),
+    markers,
+    loading,
+    error,
 
     hasMarkers,
     isEmpty,

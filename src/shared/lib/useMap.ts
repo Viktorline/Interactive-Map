@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, readonly, type Ref } from 'vue'
+import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 import Map from 'ol/Map'
 import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
@@ -65,9 +65,9 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
   })
 
   return {
-    map: readonly(map),
-    isLoading: readonly(isLoading),
-    error: readonly(error),
+    map,
+    isLoading,
+    error,
     initializeMap,
     destroyMap,
   }

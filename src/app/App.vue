@@ -20,6 +20,7 @@ body {
 
 #app {
   width: 100%;
+  min-width: 900px;
   height: 100dvh;
 }
 </style>
