@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import MapView from '@/widgets/MapView/MapView.vue'
+</script>
 
 <template>
   <div class="wrapper">
@@ -6,7 +8,7 @@
       <h2>Сайдбар</h2>
     </div>
     <div class="mapContainer">
-      <h2>Карта</h2>
+      <MapView />
     </div>
   </div>
 </template>
@@ -22,12 +24,11 @@
   width: 30%;
   background-color: #f5f5f5;
   padding: 20px;
-  border-right: 1px solid #ddd;
+  border-right: 2px solid #ddd;
 }
 
 .mapContainer {
   width: 70%;
-  padding: 20px;
   background-color: #fff;
 }
 
