@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import MarkerItem from './MarkerItem/MarkerItem.vue'
-import { Search, MapPin, Plus, Loader2 } from 'lucide-vue-next'
+import SearchInput from './SearchInput/SearchInput.vue'
+import { MapPin, Plus, Loader2 } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { TEXTS } from '@/shared/constants/texts'
 
@@ -31,7 +32,7 @@ const handleAddLocation = () => {
   }
 }
 
-const myLocationMarker = computed(() => store.markers.find((m) => m.text === TEXTS.myLocation))
+const myLocationMarker = computed(() => store.myLocationMarker)
 
 const hasMyLocation = computed(() => !!myLocationMarker.value)
 
@@ -48,10 +49,7 @@ const handleMyLocation = () => {
 
 <template>
   <aside class="sidebar">
-    <header class="sidebar-header">
-      <input type="text" :placeholder="TEXTS.searchPlaceholder" class="search-input" />
-      <Search />
-    </header>
+    <SearchInput />
 
     <div class="location-buttons">
       <button
@@ -79,7 +77,7 @@ const handleMyLocation = () => {
 
     <section class="marker-list">
       <MarkerItem
-        v-for="m in store.markers.filter((marker) => marker.text !== TEXTS.myLocation)"
+        v-for="m in store.markers"
         :key="m.id"
         :marker="m"
         @focus="props.focusOnCoordinates?.(m.coordinates as [number, number])"
@@ -103,28 +101,6 @@ const handleMyLocation = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding-right: 16px;
-}
-
-.search-input {
-  flex: 1;
-  background: #ffffff;
-  border: 1px solid #000000;
-  padding: 8px;
-  color: black;
-  border-radius: 10px;
-}
-
-.search-icon {
-  font-size: 18px;
-  color: black;
 }
 
 .location-buttons {

@@ -98,7 +98,7 @@ function closeAllPopups() {
     if (!container) return
 
     const marker = store.markers.find((m) => m.id === id)
-    if (marker && marker.text === TEXTS.myLocation) return
+    if (!marker) return
 
     const popupVNode = h(Popup, {
       state: 'icon',
@@ -115,7 +115,7 @@ function openPopup(id: string) {
     if (!container) return
 
     const marker = store.markers.find((m) => m.id === otherId)
-    if (marker && marker.text === TEXTS.myLocation) return
+    if (!marker) return
 
     const state = id === otherId ? 'view' : 'icon'
 
@@ -132,9 +132,8 @@ function openPopup(id: string) {
 onMounted(async () => {
   await store.loadMarkersFromStorage()
 
-  const myLocationMarker = store.markers.find((m) => m.text === TEXTS.myLocation)
-  if (myLocationMarker && map.value) {
-    focusOnCoordinates(myLocationMarker.coordinates as [number, number], 12)
+  if (store.myLocationMarker && map.value) {
+    focusOnCoordinates(store.myLocationMarker.coordinates as [number, number], 12)
   }
 
   if (map.value) {
@@ -166,40 +165,70 @@ onMounted(async () => {
       overlays.value = []
 
       markers.forEach((marker) => {
-        if (marker.text === TEXTS.myLocation) {
-          const container = document.createElement('div')
-          const markerVNode = h(UserLocationMarker)
-          render(markerVNode, container)
-          const overlay = new Overlay({
-            element: container,
-            positioning: 'bottom-center',
-            stopEvent: false,
-          })
+        const container = document.createElement('div')
 
-          overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
-          map.value!.addOverlay(overlay)
-          overlays.value.push({ id: marker.id, overlay, state: 'icon' })
-        } else {
-          const container = document.createElement('div')
+        const popupVNode = h(Popup, {
+          state: 'icon',
+          marker: marker as Marker,
+          onClick: () => openPopup(marker.id),
+        })
+        render(popupVNode, container)
 
-          const popupVNode = h(Popup, {
-            state: 'icon',
-            marker: marker as Marker,
-            onClick: () => openPopup(marker.id),
-          })
-          render(popupVNode, container)
+        const overlay = new Overlay({
+          element: container,
+          positioning: 'bottom-center',
+          stopEvent: false,
+        })
 
-          const overlay = new Overlay({
-            element: container,
-            positioning: 'bottom-center',
-            stopEvent: false,
-          })
+        overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
+        map.value!.addOverlay(overlay)
+        overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+      })
 
-          overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
-          map.value!.addOverlay(overlay)
-          overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+      if (store.myLocationMarker) {
+        const container = document.createElement('div')
+        const markerVNode = h(UserLocationMarker)
+        render(markerVNode, container)
+        const overlay = new Overlay({
+          element: container,
+          positioning: 'bottom-center',
+          stopEvent: false,
+        })
+
+        overlay.setPosition(fromLonLat(store.myLocationMarker.coordinates as [number, number]))
+        map.value!.addOverlay(overlay)
+        overlays.value.push({ id: 'my-location', overlay, state: 'icon' })
+      }
+    },
+    { immediate: true },
+  )
+
+  watch(
+    () => store.myLocationMarker,
+    async (myLocationMarker) => {
+      if (!map.value) return
+
+      overlays.value.forEach(({ id, overlay }) => {
+        if (id === 'my-location') {
+          map.value!.removeOverlay(overlay)
+          overlays.value = overlays.value.filter(({ id: overlayId }) => overlayId !== 'my-location')
         }
       })
+
+      if (myLocationMarker) {
+        const container = document.createElement('div')
+        const markerVNode = h(UserLocationMarker)
+        render(markerVNode, container)
+        const overlay = new Overlay({
+          element: container,
+          positioning: 'bottom-center',
+          stopEvent: false,
+        })
+
+        overlay.setPosition(fromLonLat(myLocationMarker.coordinates as [number, number]))
+        map.value!.addOverlay(overlay)
+        overlays.value.push({ id: 'my-location', overlay, state: 'icon' })
+      }
     },
     { immediate: true },
   )
