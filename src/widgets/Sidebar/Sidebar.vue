@@ -2,11 +2,13 @@
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import MarkerItem from './MarkerItem/MarkerItem.vue'
 import { Search, MapPin, Plus, Loader2 } from 'lucide-vue-next'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { TEXTS } from '@/shared/constants/texts'
 
 interface Props {
   focusOnCoordinates?: ((coordinates: [number, number], zoom?: number) => void) | null
+  setAddingMarkerMode?: ((enabled: boolean) => void) | null
+  isAddingMarker?: boolean
 }
 
 const props = defineProps<Props>()
@@ -23,7 +25,10 @@ onMounted(async () => {
 })
 
 const handleAddLocation = () => {
-  // добавить
+  if (props.setAddingMarkerMode) {
+    const newValue = !props.isAddingMarker
+    props.setAddingMarkerMode(newValue)
+  }
 }
 
 const myLocationMarker = computed(() => store.markers.find((m) => m.text === TEXTS.myLocation))
@@ -61,9 +66,14 @@ const handleMyLocation = () => {
           hasMyLocation ? TEXTS.myLocation : TEXTS.determiningLocation
         }}</span>
       </button>
-      <button @click="handleAddLocation" class="location-btn add-location" disabled>
+      <button
+        @click="handleAddLocation"
+        class="location-btn add-location"
+        :class="{ active: props.isAddingMarker }"
+        :title="props.isAddingMarker ? 'Отменить добавление' : 'Добавить новую локацию'"
+      >
         <Plus />
-        <span>{{ TEXTS.addLocation }}</span>
+        <span>{{ props.isAddingMarker ? 'Отменить' : TEXTS.addLocation }}</span>
       </button>
     </div>
 
@@ -179,6 +189,12 @@ const handleMyLocation = () => {
 .add-location {
   border-color: #6c757d;
   color: #6c757d;
+}
+
+.add-location.active {
+  border-color: #007bff;
+  color: #007bff;
+  background: #f8f9fa;
 }
 
 .animate-spin {

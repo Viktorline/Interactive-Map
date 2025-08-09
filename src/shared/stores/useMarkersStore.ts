@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import type { Marker } from '@/shared/types/marker'
 import { TEXTS } from '../constants/texts'
 import { useGeolocation } from '../lib/useGeolocation'
-import { fromLonLat } from 'ol/proj'
 
 const STORAGE_KEY = 'map-markers'
 
@@ -34,9 +33,6 @@ export const useMarkersStore = defineStore('markers', () => {
   const selectedMarker = computed(
     () => markers.value.find((m) => m.id === selectedMarkerId.value) ?? null,
   )
-
-  const hasMarkers = computed(() => markers.value.length > 0)
-  const isEmpty = computed(() => markers.value.length === 0)
 
   function setMarkers(newMarkers: Marker[]) {
     markers.value = newMarkers
@@ -91,9 +87,6 @@ export const useMarkersStore = defineStore('markers', () => {
 
     loading,
     error,
-
-    hasMarkers,
-    isEmpty,
 
     setSelectedMarker,
     setMarkers,

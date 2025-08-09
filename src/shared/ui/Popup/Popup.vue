@@ -8,7 +8,7 @@ defineProps<{
   marker: Marker
 }>()
 
-const emit = defineEmits(['close', 'save', 'click'])
+const emit = defineEmits(['close', 'save', 'click', 'delete'])
 </script>
 
 <template>
@@ -38,9 +38,16 @@ const emit = defineEmits(['close', 'save', 'click'])
       </template>
 
       <template v-else>
-        <input v-model="marker.text" />
-        <button @click="emit('save', marker.text)">💾</button>
-        <button @click="emit('close')">✖</button>
+        <div class="edit-form">
+          <input v-model="marker.text" placeholder="Введите название локации" class="edit-input" />
+          <div class="edit-buttons">
+            <button @click="emit('save', marker.text)" class="save-btn" title="Сохранить">
+              💾
+            </button>
+            <button @click="emit('delete')" class="delete-btn" title="Удалить">🗑️</button>
+            <button @click="emit('close')" class="cancel-btn" title="Отменить">✖</button>
+          </div>
+        </div>
       </template>
     </div>
   </Transition>
@@ -100,6 +107,7 @@ const emit = defineEmits(['close', 'save', 'click'])
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   font-size: 15px;
   line-height: 1.4;
+  user-select: none; /* Предотвращаем выделение текста */
 }
 
 .header {
@@ -145,5 +153,69 @@ const emit = defineEmits(['close', 'save', 'click'])
   font-size: 12px;
   cursor: pointer;
   color: #9ca3af;
+}
+
+.edit-form {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  user-select: none; /* Предотвращаем выделение текста в popup */
+}
+
+.edit-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  user-select: text; /* Разрешаем выделение текста в инпуте */
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.save-btn,
+.delete-btn,
+.cancel-btn {
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #218838;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
 }
 </style>

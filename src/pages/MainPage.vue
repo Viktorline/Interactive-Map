@@ -24,7 +24,11 @@ onMounted(() => {
 <template>
   <div class="wrapper">
     <div class="sidebar">
-      <Sidebar :focus-on-coordinates="mapViewRef?.focusOnCoordinates" />
+      <Sidebar
+        :focus-on-coordinates="mapViewRef?.focusOnCoordinates"
+        :set-adding-marker-mode="mapViewRef?.setAddingMarkerMode"
+        :is-adding-marker="mapViewRef?.isAddingMarker"
+      />
     </div>
     <div class="mapContainer">
       <MapView ref="mapViewRef" />

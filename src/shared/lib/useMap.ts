@@ -12,6 +12,7 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
   const map = ref<Map | null>(null)
   const isLoading = ref(true)
   const error = ref<string | null>(null)
+  const isAddingMarker = ref(false)
 
   const defaultCenter = fromLonLat(MOSCOW_COORDINATES)
   const defaultZoom = 10
@@ -41,19 +42,16 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
         controls: [],
       })
 
+      if (map.value.getViewport()) {
+        map.value.getViewport().style.cursor = 'default'
+      }
+
       isLoading.value = false
       error.value = null
     } catch (err) {
       error.value = err instanceof Error ? err.message : TEXTS.errorInitializing
       isLoading.value = false
     }
-  }
-
-  const updateMapCenter = (coordinates: [number, number], zoom?: number) => {
-    const view = map.value?.getView()
-    if (!view) return
-    view.setCenter(fromLonLat(coordinates))
-    view.setZoom(zoom ?? defaultZoom)
   }
 
   const destroyMap = () => {
@@ -72,6 +70,13 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     }
   }
 
+  const setAddingMarkerMode = (enabled: boolean) => {
+    isAddingMarker.value = enabled
+    if (map.value && map.value.getViewport()) {
+      map.value.getViewport().style.cursor = enabled ? 'crosshair' : 'default'
+    }
+  }
+
   onMounted(() => {
     initializeMap()
   })
@@ -84,9 +89,10 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     map,
     isLoading,
     error,
+    isAddingMarker,
     focusOnCoordinates,
-    updateMapCenter,
     initializeMap,
     destroyMap,
+    setAddingMarkerMode,
   }
 }

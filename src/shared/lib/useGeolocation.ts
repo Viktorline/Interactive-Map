@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { v4 as uuidv4 } from 'uuid'
 import type { Marker } from '@/shared/types/marker'
 import { TEXTS } from '../constants/texts'
 
@@ -48,7 +49,7 @@ export function useGeolocation() {
   const createMyLocationMarker = (coordinates: [number, number]): Marker => {
     const now = new Date().toLocaleString('ru-RU')
     return {
-      id: 'my-location',
+      id: uuidv4(),
       text: TEXTS.myLocation,
       createdAt: now,
       coordinates: coordinates,
