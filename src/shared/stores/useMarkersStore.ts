@@ -30,14 +30,6 @@ function generateTestMarkers(): Marker[] {
     { name: 'Самара', coords: [50.15, 53.2] },
     { name: 'Ростов-на-Дону', coords: [39.7015, 47.2357] },
     { name: 'Уфа', coords: [56.0409, 54.7388] },
-    { name: 'Челябинск', coords: [61.4026, 55.1599] },
-    { name: 'Самара', coords: [50.15, 53.2] },
-    { name: 'Ростов-на-Дону', coords: [39.7015, 47.2357] },
-    { name: 'Уфа', coords: [56.0409, 54.7388] },
-    { name: 'Челябинск', coords: [61.4026, 55.1599] },
-    { name: 'Самара', coords: [50.15, 53.2] },
-    { name: 'Ростов-на-Дону', coords: [39.7015, 47.2357] },
-    { name: 'Уфа', coords: [56.0409, 54.7388] },
   ]
 
   return cities.map((city, index) => ({
@@ -60,12 +52,20 @@ export const useMarkersStore = defineStore('markers', () => {
   const markers = ref<Marker[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const selectedMarkerId = ref<string | null>(null)
+  const selectedMarker = computed(
+    () => markers.value.find((m) => m.id === selectedMarkerId.value) ?? null,
+  )
 
   const hasMarkers = computed(() => markers.value.length > 0)
   const isEmpty = computed(() => markers.value.length === 0)
 
   function setMarkers(newMarkers: Marker[]) {
     markers.value = newMarkers
+  }
+
+  function setSelectedMarker(id: string | null) {
+    selectedMarkerId.value = id
   }
 
   function addMarker(marker: Marker) {
@@ -94,12 +94,16 @@ export const useMarkersStore = defineStore('markers', () => {
 
   return {
     markers,
+    selectedMarker,
+    selectedMarkerId,
+
     loading,
     error,
 
     hasMarkers,
     isEmpty,
 
+    setSelectedMarker,
     setMarkers,
     addMarker,
     removeMarker,

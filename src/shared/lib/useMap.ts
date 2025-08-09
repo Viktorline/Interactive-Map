@@ -56,6 +56,17 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     }
   }
 
+  const focusOnCoordinates = (coordinates: [number, number], zoom: number = 12) => {
+    if (map.value) {
+      const view = map.value.getView()
+      view.animate({
+        center: fromLonLat(coordinates),
+        zoom: zoom,
+        duration: 1000,
+      })
+    }
+  }
+
   onMounted(() => {
     initializeMap()
   })
@@ -68,6 +79,7 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     map,
     isLoading,
     error,
+    focusOnCoordinates,
     initializeMap,
     destroyMap,
   }

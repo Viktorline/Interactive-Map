@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, h, render, nextTick } from 'vue'
+import { ref, onMounted, watch, h, render } from 'vue'
 import Overlay from 'ol/Overlay'
 import { useMap } from '@/shared/lib/useMap'
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
@@ -13,7 +13,7 @@ const mapTarget = ref<HTMLElement | null>(null)
 const store = useMarkersStore()
 const overlays = ref<{ id: string; overlay: Overlay; state: 'icon' | 'view' }[]>([])
 
-const { map, isLoading, error } = useMap(mapTarget, {
+const { map, isLoading, error, focusOnCoordinates } = useMap(mapTarget, {
   center: MOSCOW_COORDINATES,
   zoom: 10,
 })
@@ -51,6 +51,15 @@ function openPopup(id: string) {
 
 onMounted(() => {
   store.loadMarkersFromStorage()
+
+  watch(
+    () => store.selectedMarker,
+    (selectedMarker) => {
+      if (selectedMarker && map.value) {
+        focusOnCoordinates(selectedMarker.coordinates as [number, number])
+      }
+    },
+  )
 
   watch(
     () => store.markers,

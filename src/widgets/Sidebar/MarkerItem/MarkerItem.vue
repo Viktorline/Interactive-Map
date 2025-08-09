@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { Marker } from '@/shared/types/marker'
-import { Trash, Pencil, MapPinned } from 'lucide-vue-next'
+import { Trash, LocateFixed, MapPinned } from 'lucide-vue-next'
 
 defineProps<{
   marker: Marker
+}>()
+const emit = defineEmits<{
+  (e: 'focus', id: string): void
+  (e: 'remove', id: string): void
 }>()
 </script>
 
@@ -20,10 +24,10 @@ defineProps<{
     </div>
 
     <div class="marker-actions">
-      <button disabled>
-        <Pencil />
+      <button @click="emit('focus', marker.id)" aria-label="Показать на карте">
+        <LocateFixed />
       </button>
-      <button disabled>
+      <button @click="emit('remove', marker.id)" aria-label="Удалить">
         <Trash />
       </button>
     </div>

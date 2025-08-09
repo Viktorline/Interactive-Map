@@ -14,7 +14,13 @@ const store = useMarkersStore()
     </header>
 
     <section class="marker-list">
-      <MarkerItem v-for="marker in store.markers" :key="marker.id" :marker="marker" />
+      <MarkerItem
+        v-for="m in store.markers"
+        :key="m.id"
+        :marker="m"
+        @focus="store.setSelectedMarker($event)"
+        @remove="store.removeMarker($event)"
+      />
     </section>
   </aside>
 </template>
@@ -24,7 +30,7 @@ const store = useMarkersStore()
   color: black;
   display: flex;
   flex-direction: column;
-  padding: 16px 0 0 16px;
+  padding-left: 16px;
   width: 100%;
   height: 100%;
 }
