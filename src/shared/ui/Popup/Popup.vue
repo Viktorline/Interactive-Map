@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-import { MapPin, Clock, X } from 'lucide-vue-next'
+import { MapPin, Clock, Save, Trash, X } from 'lucide-vue-next'
 import type { Marker } from '@/shared/types/marker'
 
 defineProps<{
@@ -37,15 +36,16 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
         </div>
       </template>
 
-      <template v-else>
+      <template v-else-if="state === 'edit'">
         <div class="edit-form">
-          <input v-model="marker.text" placeholder="Введите название локации" class="edit-input" />
+          <input v-model="marker.text" class="edit-input" />
           <div class="edit-buttons">
             <button @click="emit('save', marker.text)" class="save-btn" title="Сохранить">
-              💾
+              <Save />
             </button>
-            <button @click="emit('delete')" class="delete-btn" title="Удалить">🗑️</button>
-            <button @click="emit('close')" class="cancel-btn" title="Отменить">✖</button>
+            <button @click="emit('delete')" class="delete-btn" title="Удалить">
+              <Trash />
+            </button>
           </div>
         </div>
       </template>
@@ -107,7 +107,7 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   font-size: 15px;
   line-height: 1.4;
-  user-select: none; /* Предотвращаем выделение текста */
+  user-select: none;
 }
 
 .header {
@@ -162,7 +162,7 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
   border-radius: 8px;
   min-width: 200px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  user-select: none; /* Предотвращаем выделение текста в popup */
+  user-select: none;
 }
 
 .edit-input {
@@ -172,7 +172,7 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
   border-radius: 4px;
   margin-bottom: 8px;
   font-size: 14px;
-  user-select: text; /* Разрешаем выделение текста в инпуте */
+  user-select: text;
 }
 
 .edit-buttons {

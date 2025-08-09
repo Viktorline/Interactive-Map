@@ -30,7 +30,6 @@ function createNewMarker(coordinates: [number, number]) {
     coordinates: coordinates,
   }
 
-  console.log('Добавляем новый маркер:', newMarker)
   store.addMarker(newMarker)
 
   const container = document.createElement('div')
@@ -90,7 +89,7 @@ function createNewMarker(coordinates: [number, number]) {
   map.value!.addOverlay(overlay)
   overlays.value.push({ id: newMarker.id, overlay, state: 'edit' })
 
-  store.setSelectedMarker(newMarker.id)
+  setAddingMarkerMode(false)
 }
 
 function closeAllPopups() {
@@ -159,15 +158,6 @@ onMounted(async () => {
   }
 
   watch(
-    () => store.selectedMarker,
-    (selectedMarker) => {
-      if (selectedMarker && map.value) {
-        focusOnCoordinates(selectedMarker.coordinates as [number, number])
-      }
-    },
-  )
-
-  watch(
     () => store.markers,
     async (markers) => {
       if (!map.value) return
@@ -213,12 +203,6 @@ onMounted(async () => {
     },
     { immediate: true },
   )
-
-  watch(isAddingMarker, (newValue) => {
-    if (!newValue) {
-      closeAllPopups()
-    }
-  })
 })
 
 defineExpose({

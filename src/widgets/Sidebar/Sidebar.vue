@@ -2,7 +2,7 @@
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import MarkerItem from './MarkerItem/MarkerItem.vue'
 import { Search, MapPin, Plus, Loader2 } from 'lucide-vue-next'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { TEXTS } from '@/shared/constants/texts'
 
 interface Props {
@@ -82,7 +82,7 @@ const handleMyLocation = () => {
         v-for="m in store.markers.filter((marker) => marker.text !== TEXTS.myLocation)"
         :key="m.id"
         :marker="m"
-        @focus="store.setSelectedMarker($event)"
+        @focus="props.focusOnCoordinates?.(m.coordinates as [number, number])"
         @remove="store.removeMarker($event)"
       />
     </section>

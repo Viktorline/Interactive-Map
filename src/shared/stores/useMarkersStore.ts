@@ -29,17 +29,9 @@ export const useMarkersStore = defineStore('markers', () => {
   const markers = ref<Marker[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const selectedMarkerId = ref<string | null>(null)
-  const selectedMarker = computed(
-    () => markers.value.find((m) => m.id === selectedMarkerId.value) ?? null,
-  )
 
   function setMarkers(newMarkers: Marker[]) {
     markers.value = newMarkers
-  }
-
-  function setSelectedMarker(id: string | null) {
-    selectedMarkerId.value = id
   }
 
   function addMarker(marker: Marker) {
@@ -82,13 +74,10 @@ export const useMarkersStore = defineStore('markers', () => {
 
   return {
     markers,
-    selectedMarker,
-    selectedMarkerId,
 
     loading,
     error,
 
-    setSelectedMarker,
     setMarkers,
     addMarker,
     removeMarker,
