@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import MapView from '@/widgets/MapView/MapView.vue'
 import Sidebar from '@/widgets/Sidebar/Sidebar.vue'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { TEXTS } from '@/shared/constants/texts'
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 
 const markersStore = useMarkersStore()
+const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 
 onMounted(() => {
   markersStore.setLoading(true)
@@ -23,10 +24,10 @@ onMounted(() => {
 <template>
   <div class="wrapper">
     <div class="sidebar">
-      <Sidebar />
+      <Sidebar :focus-on-coordinates="mapViewRef?.focusOnCoordinates" />
     </div>
     <div class="mapContainer">
-      <MapView />
+      <MapView ref="mapViewRef" />
     </div>
   </div>
 </template>

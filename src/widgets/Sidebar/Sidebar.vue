@@ -1,21 +1,75 @@
 <script setup lang="ts">
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import MarkerItem from './MarkerItem/MarkerItem.vue'
-import { Search } from 'lucide-vue-next'
+import { Search, MapPin, Plus, Loader2 } from 'lucide-vue-next'
+import { computed, onMounted, ref } from 'vue'
+import { TEXTS } from '@/shared/constants/texts'
+
+interface Props {
+  focusOnCoordinates?: ((coordinates: [number, number], zoom?: number) => void) | null
+}
+
+const props = defineProps<Props>()
 
 const store = useMarkersStore()
+const isInitializing = ref(true)
+
+onMounted(async () => {
+  try {
+    await store.loadMarkersFromStorage()
+  } finally {
+    isInitializing.value = false
+  }
+})
+
+const handleAddLocation = () => {
+  // добавить
+}
+
+const myLocationMarker = computed(() => store.markers.find((m) => m.text === TEXTS.myLocation))
+
+const hasMyLocation = computed(() => !!myLocationMarker.value)
+
+const showLoading = computed(
+  () => isInitializing.value || (!hasMyLocation.value && !isInitializing.value),
+)
+
+const handleMyLocation = () => {
+  if (myLocationMarker.value && props.focusOnCoordinates) {
+    props.focusOnCoordinates(myLocationMarker.value.coordinates as [number, number], 15)
+  }
+}
 </script>
 
 <template>
   <aside class="sidebar">
     <header class="sidebar-header">
-      <input type="text" placeholder="Поиск..." class="search-input" />
+      <input type="text" :placeholder="TEXTS.searchPlaceholder" class="search-input" />
       <Search />
     </header>
 
+    <div class="location-buttons">
+      <button
+        @click="handleMyLocation"
+        class="location-btn my-location"
+        :disabled="!hasMyLocation"
+        :title="hasMyLocation ? TEXTS.goToMyLocation : TEXTS.determiningLocationTitle"
+      >
+        <MapPin v-if="hasMyLocation" />
+        <Loader2 v-else-if="showLoading" class="animate-spin" />
+        <span class="location-btn-text">{{
+          hasMyLocation ? TEXTS.myLocation : TEXTS.determiningLocation
+        }}</span>
+      </button>
+      <button @click="handleAddLocation" class="location-btn add-location" disabled>
+        <Plus />
+        <span>{{ TEXTS.addLocation }}</span>
+      </button>
+    </div>
+
     <section class="marker-list">
       <MarkerItem
-        v-for="m in store.markers"
+        v-for="m in store.markers.filter((marker) => marker.text !== TEXTS.myLocation)"
         :key="m.id"
         :marker="m"
         @focus="store.setSelectedMarker($event)"
@@ -61,6 +115,83 @@ const store = useMarkersStore()
 .search-icon {
   font-size: 18px;
   color: black;
+}
+
+.location-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-right: 16px;
+}
+
+.location-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  color: #333;
+  max-width: 50%;
+}
+
+.location-btn-text {
+  white-space: wrap;
+}
+
+.location-btn:hover:not(:disabled) {
+  border-color: #007bff;
+  background: #f8f9fa;
+}
+
+.location-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.location-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.my-location {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.my-location:hover:not(:disabled) {
+  background: #f8fff9;
+  border-color: #20c997;
+}
+
+.my-location:disabled {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.add-location {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .marker-list {

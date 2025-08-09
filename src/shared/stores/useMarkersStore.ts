@@ -1,43 +1,21 @@
 import { defineStore } from 'pinia'
-import { ref, computed, readonly } from 'vue'
+import { ref, computed } from 'vue'
 import type { Marker } from '@/shared/types/marker'
 import { TEXTS } from '../constants/texts'
+import { useGeolocation } from '../lib/useGeolocation'
+import { fromLonLat } from 'ol/proj'
 
 const STORAGE_KEY = 'map-markers'
 
-// function readMarkersFromStorage(): Marker[] {
-//   try {
-//     const raw = localStorage.getItem(STORAGE_KEY)
-//     if (!raw) return []
-//     const parsedMarkers: Marker[] = JSON.parse(raw)
-//     return parsedMarkers
-//   } catch {
-//     return []
-//   }
-// }
-
-function generateTestMarkers(): Marker[] {
-  const now = new Date().toLocaleString('ru-RU')
-
-  const cities = [
-    { name: 'Москва', coords: [37.6176, 55.7558] },
-    { name: 'Санкт-Петербург', coords: [30.3141, 59.9386] },
-    { name: 'Новосибирск', coords: [82.9204, 55.0302] },
-    { name: 'Екатеринбург', coords: [60.6122, 56.8389] },
-    { name: 'Казань', coords: [49.1064, 55.7963] },
-    { name: 'Нижний Новгород', coords: [44.002, 56.3287] },
-    { name: 'Челябинск', coords: [61.4026, 55.1599] },
-    { name: 'Самара', coords: [50.15, 53.2] },
-    { name: 'Ростов-на-Дону', coords: [39.7015, 47.2357] },
-    { name: 'Уфа', coords: [56.0409, 54.7388] },
-  ]
-
-  return cities.map((city, index) => ({
-    id: `test-${index}`,
-    text: city.name,
-    createdAt: now,
-    coordinates: city.coords as [number, number],
-  }))
+function readMarkersFromStorage(): Marker[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return []
+    const parsedMarkers: Marker[] = JSON.parse(raw)
+    return parsedMarkers
+  } catch {
+    return []
+  }
 }
 
 function writeMarkersToStorage(markers: Marker[]): void {
@@ -86,10 +64,24 @@ export const useMarkersStore = defineStore('markers', () => {
     error.value = errorMessage
   }
 
-  function loadMarkersFromStorage() {
-    const testMarkers = generateTestMarkers()
-    setMarkers(testMarkers)
-    writeMarkersToStorage(testMarkers)
+  async function loadMarkersFromStorage() {
+    const savedMarkers = readMarkersFromStorage()
+    const hasMyLocationMarker = savedMarkers.some((m) => m.text === TEXTS.myLocation)
+
+    if (hasMyLocationMarker) {
+      setMarkers(savedMarkers)
+    } else {
+      try {
+        const { getCurrentPosition, createMyLocationMarker } = useGeolocation()
+        const coordinates = await getCurrentPosition()
+        const myLocationMarker = createMyLocationMarker(coordinates)
+        setMarkers([myLocationMarker])
+        writeMarkersToStorage([myLocationMarker])
+      } catch (err) {
+        setMarkers([])
+        writeMarkersToStorage([])
+      }
+    }
   }
 
   return {

@@ -49,11 +49,16 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     }
   }
 
+  const updateMapCenter = (coordinates: [number, number], zoom?: number) => {
+    const view = map.value?.getView()
+    if (!view) return
+    view.setCenter(fromLonLat(coordinates))
+    view.setZoom(zoom ?? defaultZoom)
+  }
+
   const destroyMap = () => {
-    if (map.value) {
-      map.value.setTarget(undefined)
-      map.value = null
-    }
+    map.value?.setTarget(undefined)
+    map.value = null
   }
 
   const focusOnCoordinates = (coordinates: [number, number], zoom: number = 12) => {
@@ -80,6 +85,7 @@ export function useMap(target: Ref<HTMLElement | null>, options: MapOptions = {}
     isLoading,
     error,
     focusOnCoordinates,
+    updateMapCenter,
     initializeMap,
     destroyMap,
   }

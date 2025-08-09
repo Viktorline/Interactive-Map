@@ -3,7 +3,7 @@ import { defineProps, defineEmits } from 'vue'
 import { MapPin, Clock, X } from 'lucide-vue-next'
 import type { Marker } from '@/shared/types/marker'
 
-const props = defineProps<{
+defineProps<{
   state: 'icon' | 'view' | 'edit'
   marker: Marker
 }>()
@@ -81,7 +81,7 @@ const emit = defineEmits(['close', 'save', 'click'])
 .icon {
   width: 24px;
   height: 24px;
-  color: #3b82f6;
+  color: #28a745;
   background: white;
   border-radius: 50%;
   padding: 2px;

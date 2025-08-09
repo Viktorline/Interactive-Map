@@ -5,7 +5,7 @@ import { useMap } from '@/shared/lib/useMap'
 import { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import { fromLonLat } from 'ol/proj'
 import { MOSCOW_COORDINATES } from '@/shared/constants/constants'
-import Popup from '@/shared/ui/Popup/Popup.vue'
+import { Popup, MyLocationMarker } from '@/shared/ui'
 import { TEXTS } from '@/shared/constants/texts'
 import type { Marker } from '@/shared/types/marker'
 
@@ -23,9 +23,12 @@ function closeAllPopups() {
     const container = overlay.getElement()
     if (!container) return
 
+    const marker = store.markers.find((m) => m.id === id)
+    if (marker && marker.text === TEXTS.myLocation) return
+
     const popupVNode = h(Popup, {
       state: 'icon',
-      marker: store.markers.find((m) => m.id === id) as Marker,
+      marker: marker as Marker,
       onClick: () => openPopup(id),
     })
     render(popupVNode, container)
@@ -37,11 +40,14 @@ function openPopup(id: string) {
     const container = overlay.getElement()
     if (!container) return
 
+    const marker = store.markers.find((m) => m.id === otherId)
+    if (marker && marker.text === TEXTS.myLocation) return
+
     const state = id === otherId ? 'view' : 'icon'
 
     const popupVNode = h(Popup, {
       state,
-      marker: store.markers.find((m) => m.id === otherId) as Marker,
+      marker: marker as Marker,
       onClose: closeAllPopups,
       onClick: () => openPopup(otherId),
     })
@@ -49,8 +55,13 @@ function openPopup(id: string) {
   })
 }
 
-onMounted(() => {
-  store.loadMarkersFromStorage()
+onMounted(async () => {
+  await store.loadMarkersFromStorage()
+
+  const myLocationMarker = store.markers.find((m) => m.text === TEXTS.myLocation)
+  if (myLocationMarker && map.value) {
+    focusOnCoordinates(myLocationMarker.coordinates as [number, number], 12)
+  }
 
   watch(
     () => store.selectedMarker,
@@ -70,33 +81,54 @@ onMounted(() => {
       overlays.value = []
 
       markers.forEach((marker) => {
-        const container = document.createElement('div')
+        if (marker.text === TEXTS.myLocation) {
+          const container = document.createElement('div')
+          const markerVNode = h(MyLocationMarker)
+          render(markerVNode, container)
+          const overlay = new Overlay({
+            element: container,
+            positioning: 'bottom-center',
+            stopEvent: false,
+          })
 
-        const popupVNode = h(Popup, {
-          state: 'icon',
-          marker: marker as Marker,
-          onClick: () => openPopup(marker.id),
-        })
-        render(popupVNode, container)
+          overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
+          map.value!.addOverlay(overlay)
+          overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+        } else {
+          const container = document.createElement('div')
 
-        const overlay = new Overlay({
-          element: container,
-          positioning: 'bottom-center',
-          stopEvent: false,
-        })
+          const popupVNode = h(Popup, {
+            state: 'icon',
+            marker: marker as Marker,
+            onClick: () => openPopup(marker.id),
+          })
+          render(popupVNode, container)
 
-        overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
-        map.value!.addOverlay(overlay)
-        overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+          const overlay = new Overlay({
+            element: container,
+            positioning: 'bottom-center',
+            stopEvent: false,
+          })
+
+          overlay.setPosition(fromLonLat(marker.coordinates as [number, number]))
+          map.value!.addOverlay(overlay)
+          overlays.value.push({ id: marker.id, overlay, state: 'icon' })
+        }
       })
 
       map.value.getViewport().addEventListener('click', (e) => {
         const isInsidePopup = (e.target as HTMLElement).closest('.popup')
-        if (!isInsidePopup) closeAllPopups()
+        if (!isInsidePopup) {
+          closeAllPopups()
+        }
       })
     },
     { immediate: true },
   )
+})
+
+defineExpose({
+  focusOnCoordinates,
 })
 </script>
 
