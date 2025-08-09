@@ -7,6 +7,7 @@ export const TEXTS = {
   errorLoadingMarkers: 'Ошибка загрузки маркеров из localStorage',
 
   searchPlaceholder: 'Поиск...',
+  newLocation: 'Новая локация',
   myLocation: 'Мое локация',
   determiningLocation: 'Определение...',
   goToMyLocation: 'Перейти к моему местоположению',
