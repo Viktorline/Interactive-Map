@@ -97,12 +97,6 @@ const handleMyLocation = () => {
   height: 100%;
 }
 
-.sidebar-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .location-buttons {
   display: flex;
   gap: 8px;

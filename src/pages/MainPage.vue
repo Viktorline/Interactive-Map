@@ -23,7 +23,7 @@ onMounted(() => {
 
 <template>
   <div class="wrapper">
-    <div class="sidebar">
+    <div class="sidebar ellipsis">
       <Sidebar
         :focus-on-coordinates="mapViewRef?.focusOnCoordinates"
         :set-adding-marker-mode="mapViewRef?.setAddingMarkerMode"
@@ -47,17 +47,9 @@ onMounted(() => {
 
 .sidebar {
   flex: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .mapContainer {
   flex: 7;
-}
-
-h2 {
-  margin: 0;
-  color: #333;
 }
 </style>

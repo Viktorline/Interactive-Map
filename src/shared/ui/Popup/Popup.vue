@@ -110,14 +110,6 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
   user-select: none;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
 .id {
   font-size: 14px;
   margin-bottom: 4px;
@@ -208,14 +200,5 @@ const emit = defineEmits(['close', 'save', 'click', 'delete'])
 
 .delete-btn:hover {
   background: #c82333;
-}
-
-.cancel-btn {
-  background: #6c757d;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background: #5a6268;
 }
 </style>

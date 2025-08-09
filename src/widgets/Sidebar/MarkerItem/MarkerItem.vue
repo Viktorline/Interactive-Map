@@ -89,10 +89,4 @@ const emit = defineEmits<{
 .marker-actions button:hover {
   color: #656565;
 }
-
-.ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 </style>

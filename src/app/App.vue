@@ -23,4 +23,10 @@ body {
   min-width: 900px;
   height: 100dvh;
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>
