@@ -1,3 +1,14 @@
+/**
+ * Composable для управления оверлеями маркеров на карте
+ * Отвечает за создание, отображение и управление состоянием всплывающих окон маркеров
+ * Поддерживает три состояния: icon (иконка), view (просмотр), edit (редактирование)
+ * Обрабатывает клики по карте для создания новых маркеров и управляет их жизненным циклом
+ *
+ * По хорошему бы разбить на три отдельных слоя:
+ * - useMarkerRendering: рендеринг маркеров и их состояний (icon, view, edit)
+ * - useMarkerEvents: обработка событий маркеров (клики, сохранение, удаление)
+ * - useMarkerLifecycle: управление жизненным циклом маркеров (создание, обновление, удаление)
+ */
 import { ref, h, render, watch, onBeforeUnmount, type Ref } from 'vue'
 import Overlay from 'ol/Overlay'
 import { fromLonLat, toLonLat } from 'ol/proj'
@@ -5,10 +16,9 @@ import type Map from 'ol/Map'
 import { v4 as uuidv4 } from 'uuid'
 import { Popup, UserLocationMarker } from '@/shared/ui'
 import type { Marker } from '@/shared/types/marker'
+import type { OverlayState } from '@/shared/types/map'
 import type { useMarkersStore } from '@/shared/stores/useMarkersStore'
 import { TEXTS } from '../constants/texts'
-
-type OverlayState = 'icon' | 'view' | 'edit'
 
 interface Params {
   map: Ref<Map | null>

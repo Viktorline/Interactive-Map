@@ -8,3 +8,5 @@ export interface MapOptions {
   center?: [number, number]
   zoom?: number
 }
+
+export type OverlayState = 'icon' | 'view' | 'edit'

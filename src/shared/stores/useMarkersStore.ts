@@ -1,3 +1,6 @@
+/**
+ * Стор для состояния маркеров на карте через localStorage и поиска
+ */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Marker } from '@/shared/types/marker'

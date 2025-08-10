@@ -1,3 +1,8 @@
+/**
+ * Composable для инициализации и управления самой картой
+ * Создает карту с базовым слоем OpenStreetMap и настраивает её параметры
+ * Предоставляет функции для фокусировки на координатах и управления режимом добавления маркеров
+ */
 import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 import Map from 'ol/Map'
 import View from 'ol/View'

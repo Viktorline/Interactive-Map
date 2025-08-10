@@ -1,9 +1,17 @@
+<!--
+  Попап маркера
+  Имеет три состояния:
+  - icon: простая иконка маркера
+  - view: карточка с информацией о маркере (текст, ID, дата создания)
+  - edit: форма для редактирования текста маркера с кнопками сохранения/удаления
+-->
 <script setup lang="ts">
 import { MapPin, Clock, Save, Trash, X } from 'lucide-vue-next'
 import type { Marker } from '@/shared/types/marker'
+import type { OverlayState } from '@/shared/types/map'
 
 defineProps<{
-  state: 'icon' | 'view' | 'edit'
+  state: OverlayState
   marker: Marker
 }>()
 
